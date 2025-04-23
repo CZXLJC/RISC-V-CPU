@@ -1,0 +1,43 @@
+`define ALUCONTROL_WIDTH 4:0
+`define DATA_WID 31:0
+
+// VGA
+`define INFO_WID   7:0
+`define INFO_NUM   0:3071  // 96*32
+`define COLOR_WID  3:0
+`define VGA_ADDR  11:0
+`define H_SYNC_PULSE 11'd128
+`define H_BACK_PORCH 11'd88
+`define H_ACTIVE_TIME 11'd800
+`define H_FRONT_PORCH 11'd40
+`define H_LINE_PERIOD 11'd1056
+`define V_SYNC_PULSE 11'd4
+`define V_BACK_PORCH 11'd23
+`define V_ACTIVE_TIME 11'd600
+`define V_FRONT_PORCH 11'd1
+`define V_FRAME_PERIOD 11'd628
+// VGA color
+`define BLACK_R 4'h0
+`define BLACK_G 4'h0
+`define BLACK_B 4'h0
+`define WHITH_R 4'hf
+`define WHITH_G 4'hf
+`define WHITH_B 4'hf
+`define YELLOW_R 4'hf
+`define YELLOW_G 4'he
+`define YELLOW_B 4'h8
+`define RED_R 4'hf
+`define RED_G 4'h6
+`define RED_B 4'h4
+`define PINK_R 4'hf
+`define PINK_G 4'hc
+`define PINK_B 4'hc
+`define ORANGE_R 4'hf
+`define ORANGE_G 4'ha
+`define ORANGE_B 4'h4
+`define LBLUE_R 4'hb
+`define LBLUE_G 4'he
+`define LBLUE_B 4'hE
+`define DBLUE_R 4'h5
+`define DBLUE_G 4'h7
+`define DBLUE_B 4'he

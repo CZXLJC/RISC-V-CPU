@@ -23,10 +23,9 @@
 module ALU(
     input logic [31:0] A,
     input logic [31:0] B,
-    input logic [3:0] ALUControl,
+    input logic [3:0] ALUControl, // 该信号是{funct7[30], funct3}的拼接
     output logic [31:0] ALUResult,
-    // output logic Zero,
-    output logic Overflow,
+    output logic Overflow, // 暂时用不上这两个信号
     output logic CarryOut
 );
     logic [32:0] AddResult, SubResult;
@@ -114,9 +113,6 @@ module ALU(
                 CarryOut = 1'b0;
             end
         endcase
-        
-        // Zero flag (for BEQ/BNE)
-        // Zero = (ALUResult == 32'b0);
     end
 
 endmodule

@@ -29,7 +29,14 @@ module ALUController(
     always_comb begin
         case (ALUOp)
             2'b00: ALUControl = 4'b0000; // ADD
-            2'b01: ALUControl = 4'b1000; // SUB
+            // 2'b01: ALUControl = 4'b1000; // SUB
+            2'b01: begin
+                if (funct3 == 3'b110 || funct3 == 3'b111) begin
+                    ALUControl = 4'b0011; // SLTU, 即无符号比较，如果A < B，ALUResult = 1, 否则ALUResult = 0, 方便到时候直接通过ALUResult判断是否跳转
+                end else begin
+                    ALUControl = 4'b1000; // SUB
+                end
+            end
             2'b10: ALUControl = {funct7, funct3};
             default: ALUControl = 4'b0000; // Default case
         endcase

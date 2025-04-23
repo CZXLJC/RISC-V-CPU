@@ -35,8 +35,10 @@ module Decoder(
     output logic ALUSrc,
     output logic RegWrite,
     output logic Jump,
+    output logic isJalr,
+    output logic isAuipc,
     output logic [3:0] ALUControl,
-    output logic [1:0] BLUControl
+    output logic [2:0] BLUControl
     );
     logic [6:0] opcode;
     logic [4:0] rs1, rs2, rd;
@@ -58,6 +60,8 @@ module Decoder(
         .MemtoReg(MemtoReg),
         .Branch(Branch),
         .Jump(Jump),
+        .isJalr(isJalr),
+        .isAuipc(isAuipc),
         .ALUSrc(ALUSrc),
         .ALUOp(ALUOp)
     );
@@ -82,6 +86,5 @@ module Decoder(
         .funct7(funct7),
         .ALUControl(ALUControl)
     );
-    BRUController u_BranchControl (
-    );
+    assign BLUControl = funct3;
 endmodule

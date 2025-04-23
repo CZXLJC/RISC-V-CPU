@@ -21,31 +21,62 @@
 
 
 module CPU(
+    // input logic mem_clk, // 这个后续可能需要用到
     input logic clk,
-    input logic rst_n,
-    // input logic [13:0] pc,
-    input logic [31:0] instruction
+    input logic rst_n
 );
-    logic [13:0] pc;
+    logic program_on; // 这个信号保证了指令与pc的同步
+    logic [31:0] instruction;
+    logic [31:0] instruction_temp;
+    logic [31:0] old_pc;
+    logic [31:0] pc;
+    logic [31:0] pc_next;
     logic [31:0] writeData;
     logic [31:0] rdata1, rdata2;
     logic [31:0] imm32;
     logic MemWrite, MemtoReg, MemRead, Branch, ALUSrc, RegWrite;
     logic Jump;
+    logic isJalr;
+    logic isAuipc;
     logic [3:0] ALUControl;
-    logic [1:0] BLUControl;
+    logic [2:0] BLUControl;
     
     logic [31:0] A, B;
     logic [31:0] ALUResult;
     logic BranchTaken;
     logic [31:0] BranchTarget;
     // logic Zero;
-    assign A = rdata1;
+    assign A = (isAuipc) ? old_pc : rdata1;
     assign B = (ALUSrc) ? imm32 : rdata2;
 
     logic [31:0] MemReadData;
 
-    assign writeData = (MemtoReg) ? MemReadData : ALUResult;
+    
+    assign instruction = program_on ? instruction_temp : 32'b0;
+    // assign writeData = (MemtoReg) ? MemReadData : ALUResult;
+    always_comb begin
+        if (Jump) begin
+            writeData = old_pc + 4;
+        end else begin
+            writeData = (MemtoReg) ? MemReadData : ALUResult;
+        end
+    end
+
+    InstructionMem u_InstructionMem(
+        .clka(clk),
+        .addra(pc>>2),
+        .douta(instruction_temp)
+    );
+
+    DataMem u_DataMem(
+        // .clka(mem_clk),
+        .clka(clk),
+        // .ena(MemRead),
+        .wea(MemWrite),
+        .addra(ALUResult>>2),
+        .dina(rdata2),
+        .douta(MemReadData)
+    );
 
     Decoder u_Decoder(
         .clk(clk),
@@ -62,7 +93,10 @@ module CPU(
         .ALUSrc(ALUSrc),
         .RegWrite(RegWrite),
         .Jump(Jump),
-        .ALUControl(ALUControl)
+        .isJalr(isJalr),
+        .isAuipc(isAuipc),
+        .ALUControl(ALUControl),
+        .BLUControl(BLUControl)
     );
 
     ALU u_ALU(
@@ -70,8 +104,6 @@ module CPU(
         .A(A),
         .B(B),
         .ALUResult(ALUResult)
-        // ,
-        // .Zero(Zero)
     );
 
     BRU u_BRU(
@@ -79,21 +111,26 @@ module CPU(
         .ALUResult(ALUResult),
         .Branch(Branch),
         .Jump(Jump),
+        .isJalr(isJalr),
         .imm32(imm32),
-        .pc(pc),
+        .pc(old_pc),
         .BranchTaken(BranchTaken),
         .BranchTarget(BranchTarget)
     );
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            pc <= 0;
+            old_pc <= 32'b0;
+            pc <= 32'b0;
+            program_on <= 1'b0;
         end else begin
-            if (Branch && BranchTaken) begin
-                pc <= pc + imm32;
+            program_on <= 1'b1;
+            if (BranchTaken) begin
+                pc <= BranchTarget;
             end else begin
                 pc <= pc + 4;
             end
+            old_pc <= pc;
         end
     end
 endmodule

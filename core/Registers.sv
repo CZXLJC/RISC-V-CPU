@@ -34,11 +34,11 @@ module Registers(
     reg [31:0] registers [31:0];
 
     always_ff @(posedge clk or negedge rst_n) begin : reg_write
-        if (~rst_n) begin
+        if (!rst_n) begin // 初始化
             registers[0] = 32'b0;
             for (integer i = 1; i < 32; i = i + 1)
                 registers[i] <= 32'b0;
-        end else if (RegWrite && (rd != 5'b0)) begin
+        end else if (RegWrite && (rd != 5'b0)) begin // 如果写入寄存器且不是x0
             registers[rd] <= writeData;
         end
     end

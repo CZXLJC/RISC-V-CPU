@@ -45,13 +45,13 @@
 module Controller(
     input logic [6:0] opcode,
     output logic RegWrite, MemWrite, MemRead, MemtoReg, ALUSrc, Branch,
-    output logic Jump,
+    output logic Jump, isJalr, isAuipc,
     output logic [1:0] ALUOp
     );
     // Decode the instruction
     logic isR, isI, isS, isB, isU, isJ;
-    logic isLoad, isImmediate, isJalr;
-    logic isLui, isAuipc;
+    logic isLoad, isImmediate;
+    logic isLui;
     assign isR = (opcode == 7'b0110011);
     assign isI = (opcode == 7'b0010011 || opcode == 7'b0000011 || opcode == 7'b1100111);
     assign isLoad = (opcode == 7'b0000011);
@@ -61,7 +61,7 @@ module Controller(
     assign isB = (opcode == 7'b1100011);
     assign isU = (opcode == 7'b0110111 || opcode == 7'b0010111);
     // assign isLui = (opcode == 7'b0110111);
-    // assign isAuipc = (opcode == 7'b0010111);
+    assign isAuipc = (opcode == 7'b0010111);
     assign isJ = (opcode == 7'b1101111); // i.e. JAL
     // Control signals
     assign RegWrite = isR || isI || isU || isJ;

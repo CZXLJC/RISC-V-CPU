@@ -9,26 +9,26 @@ module Stage_IF #(
     input  logic        rst_n,        // 复位（低有效）
     // 控制信号
     input  logic        BranchTaken,  // 分支发生信号（来自ID阶段）
-    input  logic [31:0] BranchTarget, // 分支目标地址（来自ID阶段）
+    input  logic [`DATA_WID] BranchTarget, // 分支目标地址（来自ID阶段）
     input  logic        Stall,        // 流水线阻塞信号（来自冒险检测）
     // old预测和分支相关信号
-    input  logic [31:0] old_target, old_predict_target,
+    input  logic [`DATA_WID] old_target, old_predict_target,
     input  logic        old_predict_taken, old_actual_taken,
 
     // 输出信号
-    output logic [31:0] old_pc,
-    output logic [31:0] pc_curr,   // 当前PC值
-    output logic [31:0] inst,  // 取到的指令
+    output logic [`DATA_WID] old_pc,
+    output logic [`DATA_WID] pc_curr,   // 当前PC值
+    output logic [`DATA_WID] inst,  // 取到的指令
     output logic predict_taken, // 预测的分支是否发生
-    output logic [31:0] predict_pc
+    output logic [`DATA_WID] predict_pc
 );
 
     logic program_on;
-    logic [31:0] inst_temp;
+    logic [`DATA_WID] inst_temp;
     assign program_on = rst_n;
     assign inst = program_on ? inst_temp : 32'b0;
 
-    logic [31:0] pc_next; // 下一个PC值
+    logic [`DATA_WID] pc_next; // 下一个PC值
 
     BranchPredictor u_BranchPredictor (
         .clk(clk),

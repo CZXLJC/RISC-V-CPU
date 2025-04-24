@@ -6,7 +6,7 @@ module ID_EX(
     input  logic        rst_n,
     input  logic        Stall,
     input  logic        Flush,
-    input  logic [31:0] pc_curr_in,
+    input  logic [`DATA_WID] pc_curr_in,
 
     // 来自ID阶段的控制信号
     input  logic [`ALUCONTROL_WIDTH]  ALUControl_in,
@@ -19,9 +19,9 @@ module ID_EX(
     input  logic        Branch_in,
     input  logic        Jump_in,
     // 来自ID阶段的数据信号
-    input  logic [31:0] imm32_in,
-    input  logic [31:0] rdata1_in,
-    input  logic [31:0] rdata2_in,
+    input  logic [`DATA_WID] imm32_in,
+    input  logic [`DATA_WID] rdata1_in,
+    input  logic [`DATA_WID] rdata2_in,
     input  logic [4:0]  rs1_in,
     input  logic [4:0]  rs2_in,
     input  logic [4:0]  rd_in,
@@ -35,12 +35,12 @@ module ID_EX(
     output logic        ALUSrc_out,
     output logic        Branch_out,
     output logic        Jump_out,
-    output logic [31:0] imm32_out,
+    output logic [`DATA_WID] imm32_out,
 
-    output logic [31:0] pc_curr_out,
+    output logic [`DATA_WID] pc_curr_out,
 
-    output logic [31:0] rdata1_out,
-    output logic [31:0] rdata2_out,
+    output logic [`DATA_WID] rdata1_out,
+    output logic [`DATA_WID] rdata2_out,
     output logic [4:0]  rs1_out,
     output logic [4:0]  rs2_out,
     output logic [4:0]  rd_out

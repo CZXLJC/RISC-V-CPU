@@ -7,22 +7,22 @@ module Stage_ID(
     input  logic        rst_n,
     input  logic        Stall,        // 流水线阻塞信号，在当前模块用于清刷控制信号
     // 来自IF阶段的数据
-    input  logic [31:0] inst,         // 指令
+    input  logic [`DATA_WID] inst,         // 指令
     // 来自WB阶段的写回信号
     input  logic        RegWrite_WB,  // WB阶段的寄存器写使能
     input  logic [4:0]  rd_WB,        // WB阶段的目标寄存器
-    input  logic [31:0] write_data_WB,// WB阶段的写回数据
+    input  logic [`DATA_WID] write_data_WB,// WB阶段的写回数据
 
     // 前递信号
-    // input  logic [31:0] forward_data_ex_mem,  // EX/MEM阶段前递数据
-    // input  logic [31:0] forward_data_mem_wb,  // MEM/WB阶段前递数据
+    // input  logic [`DATA_WID] forward_data_ex_mem,  // EX/MEM阶段前递数据
+    // input  logic [`DATA_WID] forward_data_mem_wb,  // MEM/WB阶段前递数据
     // input  logic [1:0]  ForwardA,             // rs1前递选择
     // input  logic [1:0]  ForwardB,              // rs2前递选择
 
     // 输出到EX阶段的信号
-    output logic [31:0] imm32,        // 生成的立即数
-    output logic [31:0] rdata1,       // 寄存器1数据
-    output logic [31:0] rdata2,       // 寄存器2数据
+    output logic [`DATA_WID] imm32,        // 生成的立即数
+    output logic [`DATA_WID] rdata1,       // 寄存器1数据
+    output logic [`DATA_WID] rdata2,       // 寄存器2数据
     output logic [4:0]  rd,           // 目标寄存器
     output logic [`ALUCONTROL_WIDTH]  ALUControl,   // ALU控制信号
     output logic [`BRUCONTROL_WIDTH]  BRUControl,   // 分支控制信号
@@ -35,7 +35,7 @@ module Stage_ID(
     output logic        Jump
 );
 
-    // logic [31:0] rdata1_temp, rdata2_temp; // 寄存器数据临时变量
+    // logic [`DATA_WID] rdata1_temp, rdata2_temp; // 寄存器数据临时变量
 
     //-----------------------------
     // 内部信号和模块实例化

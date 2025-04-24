@@ -19,16 +19,16 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
+`include "Const.svh"
 module ImmGen(
-    input logic [31:0] instruction,
-    output logic [31:0] imm32
+    input logic [`DATA_WID] instruction,
+    output logic [`DATA_WID] imm32
     );
     logic [6:0] opcode;
     logic [11:0] imm12;
     logic [19:0] imm20;
     logic [4:0] rs1, rs2, rd;
-    logic [31:0] immI, immS, immB, immU, immJ, immR;
+    logic [`DATA_WID] immI, immS, immB, immU, immJ, immR;
 
     assign opcode = instruction[6:0];
     assign imm12 = instruction[31:20];

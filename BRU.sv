@@ -3,13 +3,13 @@
 `include "Const.svh"
 module BRU(
     input logic [`BRUCONTROL_WIDTH] BRUControl,
-    input logic [31:0] ALUResult,
+    input logic [`DATA_WID] ALUResult,
     input logic Branch,
     input logic Jump,
-    input logic [31:0] pc_curr_ex,
-    input logic [31:0] imm32,
+    input logic [`DATA_WID] pc_curr_ex,
+    input logic [`DATA_WID] imm32,
     output logic BranchTaken,
-    output logic [31:0] BranchTarget
+    output logic [`DATA_WID] BranchTarget
 );
 
     always_comb begin

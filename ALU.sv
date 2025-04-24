@@ -21,10 +21,10 @@
 
 `include "Const.svh"
 module ALU(
-    input logic [31:0] A,
-    input logic [31:0] B,
+    input logic [`DATA_WID] A,
+    input logic [`DATA_WID] B,
     input logic [`ALUCONTROL_WIDTH] ALUControl,
-    output logic [31:0] ALUResult,
+    output logic [`DATA_WID] ALUResult,
     output logic Overflow,
     output logic CarryOut,
     output logic IllegalOp // Illegal operation flag

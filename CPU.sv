@@ -11,19 +11,19 @@ module CPU(
 
     
     // IF阶段信号
-    logic [31:0] pc_curr;
-    logic [31:0] old_pc;
-    logic [31:0] inst;
-    logic [31:0] predict_pc;  // 预测的下一PC值
+    logic [`DATA_WID] pc_curr;
+    logic [`DATA_WID] old_pc;
+    logic [`DATA_WID] inst;
+    logic [`DATA_WID] predict_pc;  // 预测的下一PC值
 
 
     // IF/ID寄存器信号
-    logic [31:0] if_id_inst;
-    logic [31:0] if_id_pc_curr;
+    logic [`DATA_WID] if_id_inst;
+    logic [`DATA_WID] if_id_pc_curr;
 
     // ID阶段信号
-    logic [31:0] imm32;
-    logic [31:0] rdata1, rdata2;
+    logic [`DATA_WID] imm32;
+    logic [`DATA_WID] rdata1, rdata2;
     logic [4:0]  rd;
     logic [`ALUCONTROL_WIDTH]  ALUControl;
     logic [`BRUCONTROL_WIDTH]  BRUControl;  // 分支控制信号
@@ -31,7 +31,7 @@ module CPU(
     logic        Jump;
     logic        Branch;  // 分支指令标志
     logic        BranchTaken;
-    logic [31:0] BranchTarget;
+    logic [`DATA_WID] BranchTarget;
 
     // ID/EX寄存器信号
     logic [`ALUCONTROL_WIDTH]  id_ex_ALUControl;
@@ -39,31 +39,31 @@ module CPU(
     logic        id_ex_RegWrite, id_ex_MemWrite, id_ex_MemRead, id_ex_MemtoReg, id_ex_ALUSrc;
     logic        id_ex_Branch;
     logic        id_ex_Jump;
-    logic [31:0] id_ex_imm32, id_ex_rdata1, id_ex_rdata2;
+    logic [`DATA_WID] id_ex_imm32, id_ex_rdata1, id_ex_rdata2;
     logic [4:0]  id_ex_rs1, id_ex_rs2;
     logic [4:0]  id_ex_rd;
-    logic [31:0] id_ex_pc_curr;  // ID/EX寄存器传递的当前PC值
+    logic [`DATA_WID] id_ex_pc_curr;  // ID/EX寄存器传递的当前PC值
     
     // EX阶段信号
-    logic [31:0] ex_ALUResult;  // EX阶段的ALU计算结果
+    logic [`DATA_WID] ex_ALUResult;  // EX阶段的ALU计算结果
     logic [4:0]  ex_rd;          // EX阶段的目标寄存器
     logic        ex_RegWrite;    // EX阶段的寄存器写使能
 
     // EX/MEM寄存器信号
     logic        ex_mem_RegWrite, ex_mem_MemWrite, ex_mem_MemRead, ex_mem_MemtoReg;
-    logic [31:0] ex_mem_ALUResult, ex_mem_rdata2;
+    logic [`DATA_WID] ex_mem_ALUResult, ex_mem_rdata2;
     logic [4:0]  ex_mem_rd;
 
     // MEM阶段信号
-    logic [31:0] mem_rdata;  // 从DataMem读取的数据
+    logic [`DATA_WID] mem_rdata;  // 从DataMem读取的数据
 
     // MEM/WB寄存器信号
     logic        mem_wb_RegWrite, mem_wb_MemtoReg;
-    logic [31:0] mem_wb_ALUResult, mem_wb_mem_rdata;
+    logic [`DATA_WID] mem_wb_ALUResult, mem_wb_mem_rdata;
     logic [4:0]  mem_wb_rd;
 
     // WB阶段信号
-    logic [31:0] wb_data;  // 写回寄存器的数据
+    logic [`DATA_WID] wb_data;  // 写回寄存器的数据
 
     // 控制信号: 冒险检测
     logic Stall;  // 流水线阻塞信号
@@ -74,7 +74,7 @@ module CPU(
     assign Flush = (BranchTaken && (BranchTarget != predict_pc));
     // 异常处理信号
     logic        exception;
-    logic [31:0] handler_pc;
+    logic [`DATA_WID] handler_pc;
 
     // 模块实例化
     Stage_IF #(.limit(32'b10000000)) u_Stage_IF (

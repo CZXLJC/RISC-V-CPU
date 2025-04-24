@@ -2,26 +2,26 @@
 
 `include "Const.svh"
 module Stage_EX(
-    input  logic [31:0] forward_data_ex_mem,  // EX/MEM阶段前递数据
-    input  logic [31:0] forward_data_mem_wb,  // MEM/WB阶段前递数据
+    input  logic [`DATA_WID] forward_data_ex_mem,  // EX/MEM阶段前递数据
+    input  logic [`DATA_WID] forward_data_mem_wb,  // MEM/WB阶段前递数据
     input  logic [1:0]  ForwardA,             // rs1前递选择
     input  logic [1:0]  ForwardB,              // rs2前递选择
 
-    input  logic [31:0] pc_curr_ex,     // 当前PC值
+    input  logic [`DATA_WID] pc_curr_ex,     // 当前PC值
     input  logic [`ALUCONTROL_WIDTH]  ALUControl,   // ALU操作码
     input  logic [`BRUCONTROL_WIDTH]  BRUControl,    // 分支控制信号
-    input  logic [31:0] rdata1,       // 寄存器1数据
-    input  logic [31:0] rdata2,       // 寄存器2数据
-    input  logic [31:0] imm32,        // 立即数
+    input  logic [`DATA_WID] rdata1,       // 寄存器1数据
+    input  logic [`DATA_WID] rdata2,       // 寄存器2数据
+    input  logic [`DATA_WID] imm32,        // 立即数
     input  logic        ALUSrc,       // ALU操作数选择
     input  logic        Branch,       // 分支指令标志
     input  logic        Jump,         // 跳转指令标志
-    output logic [31:0] ALUResult,    // ALU计算结果
-    output logic [31:0] BranchTarget,  // 分支目标地址
+    output logic [`DATA_WID] ALUResult,    // ALU计算结果
+    output logic [`DATA_WID] BranchTarget,  // 分支目标地址
     output logic        BranchTaken   // 分支发生标志
 );
-    logic [31:0] operand1;
-    logic [31:0] operand2;
+    logic [`DATA_WID] operand1;
+    logic [`DATA_WID] operand2;
     
     // 前递逻辑处理
     always_comb begin

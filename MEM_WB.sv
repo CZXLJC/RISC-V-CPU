@@ -10,7 +10,7 @@ module MEM_WB(
     // 来自MEM阶段的数据信号
     input  logic [`DATA_WID] ALUResult_in,
     input  logic [`DATA_WID] mem_rdata_in,
-    input  logic [4:0]  rd_in,
+    input  logic [`REG_ID_WID]  rd_in,
     // 前递信号
     input  logic        Forward_wb, // 前递控制信号，表示是否需要前递数据
     input  logic [`DATA_WID] Forward_data_wb, // 前递数据A
@@ -19,7 +19,7 @@ module MEM_WB(
     output logic        MemtoReg_out,
     output logic [`DATA_WID] ALUResult_out,
     output logic [`DATA_WID] mem_rdata_out,
-    output logic [4:0]  rd_out
+    output logic [`REG_ID_WID]  rd_out
 );
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

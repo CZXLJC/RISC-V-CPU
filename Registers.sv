@@ -24,9 +24,9 @@ module Registers(
     input logic clk,
     input logic rst_n,
     input logic RegWrite,
-    input logic [4:0] rs1,
-    input logic [4:0] rs2,
-    input logic [4:0] rd,
+    input logic [`REG_ID_WID] rs1,
+    input logic [`REG_ID_WID] rs2,
+    input logic [`REG_ID_WID] rd,
     input logic [`DATA_WID] writeData,
     output logic [`DATA_WID] rdata1,
     output logic [`DATA_WID] rdata2

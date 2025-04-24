@@ -27,7 +27,7 @@ module ImmGen(
     logic [6:0] opcode;
     logic [11:0] imm12;
     logic [19:0] imm20;
-    logic [4:0] rs1, rs2, rd;
+    logic [`REG_ID_WID] rs1, rs2, rd;
     logic [`DATA_WID] immI, immS, immB, immU, immJ, immR;
 
     assign opcode = instruction[6:0];

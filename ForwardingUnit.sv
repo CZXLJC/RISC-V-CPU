@@ -1,15 +1,16 @@
 `timescale 1ns / 1ps
 
 
+`include "Const.svh"
 // 处理写入后的执行冲突，用于前递
 module ForwardingUnit(
     // 来自ID阶段的源寄存器
-    input  logic [4:0] rs1_ex,
-    input  logic [4:0] rs2_ex,
+    input  logic [`REG_ID_WID] rs1_ex,
+    input  logic [`REG_ID_WID] rs2_ex,
     // 来自EX/MEM和MEM/WB阶段的目标寄存器
-    input  logic [4:0] rd_ex_mem,
+    input  logic [`REG_ID_WID] rd_ex_mem,
     input  logic       RegWrite_ex_mem,
-    input  logic [4:0] rd_mem_wb,
+    input  logic [`REG_ID_WID] rd_mem_wb,
     input  logic       RegWrite_mem_wb,
     // 前递控制信号，前递到ID/EX阶段
     output logic [1:0] ForwardA,  // 00: 无前递，01: EX/MEM前递，10: MEM/WB前递

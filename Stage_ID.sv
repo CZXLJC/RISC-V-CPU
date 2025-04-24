@@ -10,7 +10,7 @@ module Stage_ID(
     input  logic [`DATA_WID] inst,         // 指令
     // 来自WB阶段的写回信号
     input  logic        RegWrite_WB,  // WB阶段的寄存器写使能
-    input  logic [4:0]  rd_WB,        // WB阶段的目标寄存器
+    input  logic [`REG_ID_WID]  rd_WB,        // WB阶段的目标寄存器
     input  logic [`DATA_WID] write_data_WB,// WB阶段的写回数据
 
     // 前递信号
@@ -23,7 +23,7 @@ module Stage_ID(
     output logic [`DATA_WID] imm32,        // 生成的立即数
     output logic [`DATA_WID] rdata1,       // 寄存器1数据
     output logic [`DATA_WID] rdata2,       // 寄存器2数据
-    output logic [4:0]  rd,           // 目标寄存器
+    output logic [`REG_ID_WID]  rd,           // 目标寄存器
     output logic [`ALUCONTROL_WIDTH]  ALUControl,   // ALU控制信号
     output logic [`BRUCONTROL_WIDTH]  BRUControl,   // 分支控制信号
     output logic        RegWrite,     // 寄存器写使能
@@ -42,7 +42,7 @@ module Stage_ID(
     //-----------------------------
     // 解析指令字段
     logic [6:0]  opcode;
-    logic [4:0]  rs1, rs2;
+    logic [`REG_ID_WID]  rs1, rs2;
     logic [2:0]  funct3;
     logic        funct7;
     logic        Mfunct7; // M 拓展指令指示信号

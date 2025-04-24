@@ -12,7 +12,7 @@ module EX_MEM(
     // 来自EX阶段的数据信号
     input  logic [`DATA_WID] ALUResult_in,
     input  logic [`DATA_WID] rdata2_in,
-    input  logic [4:0]  rd_in,
+    input  logic [`REG_ID_WID]  rd_in,
     // 输出到MEM阶段的信号
     output logic        RegWrite_out,
     output logic        MemWrite_out,
@@ -20,7 +20,7 @@ module EX_MEM(
     output logic        MemtoReg_out,
     output logic [`DATA_WID] ALUResult_out,
     output logic [`DATA_WID] rdata2_out,
-    output logic [4:0]  rd_out
+    output logic [`REG_ID_WID]  rd_out
 );
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

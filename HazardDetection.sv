@@ -1,13 +1,14 @@
 `timescale 1ns / 1ps
 
+`include "Const.svh"
 // 处理读取后的执行冲突，用于阻塞和冲刷
 module HazardDetection(
     // 来自ID阶段的指令信息
-    input  logic [4:0] rs1_id,
-    input  logic [4:0] rs2_id,
+    input  logic [`REG_ID_WID] rs1_id,
+    input  logic [`REG_ID_WID] rs2_id,
     // 来自EX阶段的指令类型
     input  logic       MemRead_ex,
-    input  logic [4:0] rd_ex,
+    input  logic [`REG_ID_WID] rd_ex,
     // DCache信号
     // input  logic       Hit,
     // 输出控制信号 

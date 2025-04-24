@@ -24,7 +24,7 @@ module CPU(
     // ID阶段信号
     logic [`DATA_WID] imm32;
     logic [`DATA_WID] rdata1, rdata2;
-    logic [4:0]  rd;
+    logic [`REG_ID_WID]  rd;
     logic [`ALUCONTROL_WIDTH]  ALUControl;
     logic [`BRUCONTROL_WIDTH]  BRUControl;  // 分支控制信号
     logic        RegWrite, MemWrite, MemRead, MemtoReg, ALUSrc;
@@ -40,19 +40,19 @@ module CPU(
     logic        id_ex_Branch;
     logic        id_ex_Jump;
     logic [`DATA_WID] id_ex_imm32, id_ex_rdata1, id_ex_rdata2;
-    logic [4:0]  id_ex_rs1, id_ex_rs2;
-    logic [4:0]  id_ex_rd;
+    logic [`REG_ID_WID]  id_ex_rs1, id_ex_rs2;
+    logic [`REG_ID_WID]  id_ex_rd;
     logic [`DATA_WID] id_ex_pc_curr;  // ID/EX寄存器传递的当前PC值
     
     // EX阶段信号
     logic [`DATA_WID] ex_ALUResult;  // EX阶段的ALU计算结果
-    logic [4:0]  ex_rd;          // EX阶段的目标寄存器
+    logic [`REG_ID_WID]  ex_rd;          // EX阶段的目标寄存器
     logic        ex_RegWrite;    // EX阶段的寄存器写使能
 
     // EX/MEM寄存器信号
     logic        ex_mem_RegWrite, ex_mem_MemWrite, ex_mem_MemRead, ex_mem_MemtoReg;
     logic [`DATA_WID] ex_mem_ALUResult, ex_mem_rdata2;
-    logic [4:0]  ex_mem_rd;
+    logic [`REG_ID_WID]  ex_mem_rd;
 
     // MEM阶段信号
     logic [`DATA_WID] mem_rdata;  // 从DataMem读取的数据
@@ -60,7 +60,7 @@ module CPU(
     // MEM/WB寄存器信号
     logic        mem_wb_RegWrite, mem_wb_MemtoReg;
     logic [`DATA_WID] mem_wb_ALUResult, mem_wb_mem_rdata;
-    logic [4:0]  mem_wb_rd;
+    logic [`REG_ID_WID]  mem_wb_rd;
 
     // WB阶段信号
     logic [`DATA_WID] wb_data;  // 写回寄存器的数据

@@ -22,9 +22,9 @@ module ID_EX(
     input  logic [`DATA_WID] imm32_in,
     input  logic [`DATA_WID] rdata1_in,
     input  logic [`DATA_WID] rdata2_in,
-    input  logic [4:0]  rs1_in,
-    input  logic [4:0]  rs2_in,
-    input  logic [4:0]  rd_in,
+    input  logic [`REG_ID_WID]  rs1_in,
+    input  logic [`REG_ID_WID]  rs2_in,
+    input  logic [`REG_ID_WID]  rd_in,
     // 输出到EX阶段的信号
     output logic [`ALUCONTROL_WIDTH]  ALUControl_out,
     output logic [`BRUCONTROL_WIDTH]  BRUControl_out,
@@ -41,9 +41,9 @@ module ID_EX(
 
     output logic [`DATA_WID] rdata1_out,
     output logic [`DATA_WID] rdata2_out,
-    output logic [4:0]  rs1_out,
-    output logic [4:0]  rs2_out,
-    output logic [4:0]  rd_out
+    output logic [`REG_ID_WID]  rs1_out,
+    output logic [`REG_ID_WID]  rs2_out,
+    output logic [`REG_ID_WID]  rd_out
 );
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n || Flush) begin

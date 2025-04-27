@@ -1,10 +1,10 @@
 // Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2017.4 (win64) Build 2086221 Fri Dec 15 20:55:39 MST 2017
-// Date        : Mon Apr 28 05:11:21 2025
+// Date        : Mon Apr 28 05:43:50 2025
 // Host        : Betterlol running 64-bit major release  (build 9200)
-// Command     : write_verilog -force -mode synth_stub -rename_top InstructionMem -prefix
-//               InstructionMem_ InstructionMem_stub.v
+// Command     : write_verilog -force -mode synth_stub
+//               D:/OneDrive/Desktop/RISC-V-CPU/ip/InstructionMem_1/InstructionMem_stub.v
 // Design      : InstructionMem
 // Purpose     : Stub declaration of top-level module interface
 // Device      : xc7a35tcsg324-1

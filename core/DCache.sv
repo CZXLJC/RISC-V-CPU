@@ -34,20 +34,15 @@ logic [3:0]       mem_byte_enable;     // 内存字节使能
 logic             mem_write_enable;    // 内存写使能
 logic             write_pending;       // 写操作未命中标志
 
-// 锁存指令控制信号
-// logic             req_data_write;       // 请求读取数据
-// logic             req_mem_read;         // 请求读取内存
-// logic             req_mem_write;        // 请求写入内存
-// logic [2:0]       req_mem_control;      // 请求存储控制信号
-
-
 logic read_mem_cnt;
+logic write_mem_cnt;
 
 // 请求地址寄存器
 logic [`DATA_WID] req_addr;            // 保存请求地址
 logic [CACHE_WID-1:0] req_index;       // 保存请求索引
 logic [1:0]           req_offset;      // 保存请求偏移
 logic [TAG_WIDTH-1:0] req_tag;         // 保存请求Tag
+// logic [3:0]           req_sll;         // 保存请求SLL（用于字节选择）
 
 // 地址分解
 logic [TAG_WIDTH-1:0] curr_tag;
@@ -90,6 +85,7 @@ always_ff @(posedge clk or negedge rst_n) begin
         req_offset <= 4;
         req_tag <= 4;
         read_mem_cnt <= 0;
+        write_mem_cnt <= 1; // 暂时默认写内存用1个周期
     end else begin
         state <= next_state;
         if (state == IDLE && (MemRead || MemWrite)) begin
@@ -97,10 +93,6 @@ always_ff @(posedge clk or negedge rst_n) begin
             req_index <= curr_index;
             req_offset <= curr_offset;
             req_tag <= curr_tag;
-            // req_mem_read <= MemRead;
-            // req_mem_write <= MemWrite;
-            // req_mem_control <= MEMControl;
-            // req_data_write <= data_write;
         end
         if (state == WRITE_CACHE) begin
             if (write_pending) begin
@@ -133,13 +125,18 @@ end
 
 // 数据更新逻辑（用于写操作）
 always_comb begin
-    updated_data = cache[req_index].data;
+    if (write_pending) begin
+        // 写不命中，即写需要等待内存读取，因此更新的数据应该基于内存读取的数据！
+        updated_data = mem_data_read;
+    end else begin
+        updated_data = cache[req_index].data;
+    end
     case (MEMControl)
         3'b000: begin // sb
             updated_data[req_offset*8 +: 8] = data_write[7:0];
         end
         3'b001: begin // sh
-            if (req_offset[0] == 0) begin
+            if (req_offset[0] == 0) begin // 偏移为偶数
                 updated_data[req_offset*8 +: 16] = data_write[15:0];
             end
         end
@@ -204,6 +201,7 @@ always_comb begin
         end
 
         READ_MEM: begin
+            // 等待内存读取完成，耗时两个周期
             if (read_mem_cnt) begin
                 next_state = WRITE_CACHE;
             end
@@ -220,7 +218,21 @@ always_comb begin
         WRITE_CACHE: begin
             if (!write_pending) begin
                 // 读未命中：返回内存数据
-                data_read = mem_data_read;
+                // data_read = mem_data_read;
+                case (MEMControl)
+                        3'b000: begin // lb
+                            data_read = {{24{mem_data_read[req_offset*8 + 7]}}, mem_data_read[req_offset*8 +: 8]};
+                        end
+                        3'b001: begin // lh
+                            if (req_offset[0] == 0) begin
+                                data_read = {{16{mem_data_read[req_offset*8 + 15]}}, mem_data_read[req_offset*8 +: 16]};
+                            end
+                        end
+                        3'b010: begin // lw
+                            data_read = mem_data_read;
+                        end
+                        default: data_read = cache[curr_index].data;
+                endcase
             end
             next_state = IDLE;
             stall_dcache = 0;

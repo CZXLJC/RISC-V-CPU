@@ -54,7 +54,7 @@ CPU  u_CPU (
 
 initial
 begin
-    #(1000) $finish;
+    #(3000) $finish;
 end
 
 endmodule

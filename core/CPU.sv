@@ -21,18 +21,17 @@
 
 
 module CPU(
-    // input logic mem_clk, // 这个后续可能需要用到
     input logic clk,
     input logic rst_n
 );
+
+    logic mem_clk;
     logic program_on; // 这个信号保证了指令与pc的同步
     logic [31:0] instruction;
     logic [31:0] instruction_temp;
     logic [31:0] old_pc;
     logic [31:0] pc;
-    logic [31:0] pc_next;
-    logic [31:0] writeData;
-    logic [31:0] rdata1, rdata2;
+    logic [31:0] pc_real;
     logic [31:0] imm32;
     logic MemWrite, MemtoReg, MemRead, Branch, ALUSrc, RegWrite;
     logic Jump;
@@ -40,20 +39,21 @@ module CPU(
     logic isAuipc;
     logic [3:0] ALUControl;
     logic [2:0] BLUControl;
-    
+    logic [2:0] MEMControl;
+
+    logic [31:0] writeData;
+    logic [31:0] rdata1, rdata2;
     logic [31:0] A, B;
     logic [31:0] ALUResult;
     logic BranchTaken;
     logic [31:0] BranchTarget;
-    // logic Zero;
+    logic [31:0] MemReadData;
+    logic stall_dcache;
+    logic flush;
     assign A = (isAuipc) ? old_pc : rdata1;
     assign B = (ALUSrc) ? imm32 : rdata2;
 
-    logic [31:0] MemReadData;
-
-    
     assign instruction = program_on ? instruction_temp : 32'b0;
-    // assign writeData = (MemtoReg) ? MemReadData : ALUResult;
     always_comb begin
         if (Jump) begin
             writeData = old_pc + 4;
@@ -64,23 +64,27 @@ module CPU(
 
     InstructionMem u_InstructionMem(
         .clka(clk),
-        .addra(pc>>2),
+        .addra(pc_real>>2),
         .douta(instruction_temp)
     );
 
-    DataMem u_DataMem(
-        // .clka(mem_clk),
-        .clka(clk),
-        // .ena(MemRead),
-        .wea(MemWrite),
-        .addra(ALUResult>>2),
-        .dina(rdata2),
-        .douta(MemReadData)
+    DCache u_DCache(
+        .clk(clk),
+        .rst_n(rst_n),
+        .addr(ALUResult>>2),
+        .data_write(rdata2),
+        .data_read(MemReadData),
+        .MEMControl(MEMControl),
+        .MemRead(MemRead),
+        .MemWrite(MemWrite),
+        .stall_dcache(stall_dcache)
     );
 
     Decoder u_Decoder(
         .clk(clk),
         .rst_n(rst_n),
+        .stall(1'b0),
+        .flush(flush),
         .instruction(instruction),
         .writeData(writeData),
         .rdata1(rdata1),
@@ -96,7 +100,8 @@ module CPU(
         .isJalr(isJalr),
         .isAuipc(isAuipc),
         .ALUControl(ALUControl),
-        .BLUControl(BLUControl)
+        .BLUControl(BLUControl),
+        .MEMControl(MEMControl)
     );
 
     ALU u_ALU(
@@ -123,14 +128,19 @@ module CPU(
             old_pc <= 32'b0;
             pc <= 32'b0;
             program_on <= 1'b0;
+            flush <= 1'b0;
         end else begin
             program_on <= 1'b1;
             if (BranchTaken) begin
                 pc <= BranchTarget;
-            end else begin
+                flush <= 1'b1;
+            end else if (!stall_dcache) begin
                 pc <= pc + 4;
-            end
-            old_pc <= pc;
+                old_pc <= pc;
+                flush <= 1'b0;
+            end 
         end
     end
+
+    assign pc_real = stall_dcache ? old_pc : pc;
 endmodule

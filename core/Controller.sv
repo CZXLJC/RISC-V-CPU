@@ -71,7 +71,7 @@ module Controller(
     assign ALUSrc = isI || isS || isU || isJ;
     assign Branch = isB;
     assign ALUOp = 
-        (isI || isS) ? 2'b00 : // I-type and S-type, perform add operation
+        (isLoad || isS) ? 2'b00 : // I-type and S-type, perform add operation
         (isB) ? 2'b01 : // B-type, perform minus operation
         (isR) ? 2'b10 : // R-type
         // else -> default

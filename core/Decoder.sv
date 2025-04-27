@@ -23,6 +23,8 @@
 module Decoder(
     input logic clk,
     input logic rst_n,
+    input logic flush,
+    input logic stall,
     input logic [31:0] instruction,
     input logic [31:0] writeData,
     output logic [31:0] rdata1,
@@ -38,7 +40,8 @@ module Decoder(
     output logic isJalr,
     output logic isAuipc,
     output logic [3:0] ALUControl,
-    output logic [2:0] BLUControl
+    output logic [2:0] BLUControl,
+    output logic [2:0] MEMControl
     );
     logic [6:0] opcode;
     logic [4:0] rs1, rs2, rd;
@@ -51,18 +54,46 @@ module Decoder(
     assign rs2 = instruction[24:20];
     assign funct7 = instruction[30];
     assign funct3 = instruction[14:12];
+
+
+    logic MemWrite_temp;
+    logic MemtoReg_temp;
+    logic MemRead_temp;
+    logic Branch_temp;
+    logic ALUSrc_temp;
+    logic RegWrite_temp;
+    logic Jump_temp;
+    logic isJalr_temp;
+    logic isAuipc_temp;
+    assign MemWrite = (flush) ? 1'b0 : MemWrite_temp;
+    assign MemtoReg = (flush) ? 1'b0 : MemtoReg_temp;
+    assign MemRead = (flush) ? 1'b0 : MemRead_temp;
+    assign Branch = (flush) ? 1'b0 : Branch_temp;
+    assign ALUSrc = (flush) ? 1'b0 : ALUSrc_temp;
+    assign RegWrite = (flush) ? 1'b0 : RegWrite_temp;
+    assign Jump = (flush) ? 1'b0 : Jump_temp;
+    assign isJalr = (flush) ? 1'b0 : isJalr_temp;
+    assign isAuipc = (flush) ? 1'b0 : isAuipc_temp;
     
     Controller u_Controller (
         .opcode(opcode),
-        .RegWrite(RegWrite),
-        .MemWrite(MemWrite),
-        .MemRead(MemRead),
-        .MemtoReg(MemtoReg),
-        .Branch(Branch),
-        .Jump(Jump),
-        .isJalr(isJalr),
-        .isAuipc(isAuipc),
-        .ALUSrc(ALUSrc),
+        .RegWrite(RegWrite_temp),
+        .MemWrite(MemWrite_temp),
+        .MemRead(MemRead_temp),
+        .MemtoReg(MemtoReg_temp),
+        .Branch(Branch_temp),
+        .Jump(Jump_temp),
+        .isJalr(isJalr_temp),
+        .isAuipc(isAuipc_temp),
+        .ALUSrc(ALUSrc_temp),
+        // .MemWrite(MemWrite),
+        // .MemRead(MemRead),
+        // .MemtoReg(MemtoReg),
+        // .Branch(Branch),
+        // .Jump(Jump),
+        // .isJalr(isJalr),
+        // .isAuipc(isAuipc),
+        // .ALUSrc(ALUSrc),
         .ALUOp(ALUOp)
     );
     Registers u_Registers (
@@ -87,4 +118,5 @@ module Decoder(
         .ALUControl(ALUControl)
     );
     assign BLUControl = funct3;
+    assign MEMControl = funct3;
 endmodule

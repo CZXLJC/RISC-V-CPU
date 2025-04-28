@@ -22,13 +22,13 @@
 // `include "Const.svh"
 module CPU(
     input logic clk,
-    input logic rst_n
+    input logic rst_n,
+    output logic [7:0] led
 );
 
     logic mem_clk;
     logic program_on; // 这个信号保证了指令与pc的同步
     logic [31:0] instruction;
-    logic [31:0] instruction_temp;
     logic [31:0] old_pc;
     logic [31:0] pc;
     logic [31:0] pc_real;
@@ -44,17 +44,19 @@ module CPU(
 
     logic [31:0] writeData;
     logic [31:0] rdata1, rdata2;
+    logic [31:0] rdata3; // x8寄存器的值
     logic [31:0] A, B;
     logic [31:0] ALUResult;
     logic BranchTaken;
     logic [31:0] BranchTarget;
     logic [31:0] MemReadData;
     logic stall_dcache;
+    logic stall_waitInput;
     logic flush;
     assign A = (isAuipc) ? old_pc : rdata1;
     assign B = (ALUSrc) ? imm32 : rdata2;
+    assign led[7:0] = rdata3[7:0];
 
-    assign instruction = program_on ? instruction_temp : 32'b0;
     always_comb begin
         if (Jump) begin
             writeData = old_pc + 4;
@@ -64,14 +66,15 @@ module CPU(
     end
 
     logic exception;
-    // logic [`DATA_WID] handler_pc;
     logic [31:0] handler_pc;
     logic [31:0] csr_pc;
 
     InstructionMem u_InstructionMem(
         .clka(clk),
+        // 读使能
+        .ena(program_on),
         .addra(pc_real>>2),
-        .douta(instruction_temp)
+        .douta(instruction)
     );
 
     DCache u_DCache(
@@ -95,6 +98,7 @@ module CPU(
         .writeData(writeData),
         .rdata1(rdata1),
         .rdata2(rdata2),
+        .rdata3(rdata3),
         .imm32(imm32),
         .MemWrite(MemWrite),
         .MemtoReg(MemtoReg),
@@ -153,20 +157,22 @@ module CPU(
             flush <= 1'b0;
         end else begin
             program_on <= 1'b1;
-            if (mret) begin
-                pc <= csr_pc;
-                flush <= 1'b1;
-            end else if (exception) begin
-                pc <= handler_pc;
-                flush <= 1'b1;
-            end else if (BranchTaken) begin
-                pc <= BranchTarget;
-                flush <= 1'b1;
-            end else if (!stall_dcache) begin
-                pc <= pc + 4;
-                old_pc <= pc;
-                flush <= 1'b0;
-            end 
+            if (program_on) begin
+                if (mret) begin
+                    pc <= csr_pc;
+                    flush <= 1'b1;
+                end else if (exception) begin
+                    pc <= handler_pc;
+                    flush <= 1'b1;
+                end else if (BranchTaken) begin
+                    pc <= BranchTarget;
+                    flush <= 1'b1;
+                end else if (!stall_dcache) begin
+                    pc <= pc + 4;
+                    old_pc <= pc;
+                    flush <= 1'b0;
+                end
+            end
         end
     end
 

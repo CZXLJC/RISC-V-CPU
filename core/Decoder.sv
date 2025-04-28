@@ -29,6 +29,7 @@ module Decoder(
     input logic [31:0] writeData,
     output logic [31:0] rdata1,
     output logic [31:0] rdata2,
+    output logic [31:0] rdata3,
     output logic [31:0] imm32,
     output logic MemWrite,
     output logic MemtoReg,
@@ -114,7 +115,8 @@ module Decoder(
         .rd(rd),
         .writeData(writeData),
         .rdata1(rdata1),
-        .rdata2(rdata2)
+        .rdata2(rdata2),
+        .rdata3(rdata3)
     );
     ImmGen u_ImmGen (
         .instruction(instruction),

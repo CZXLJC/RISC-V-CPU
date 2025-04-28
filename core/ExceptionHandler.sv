@@ -14,6 +14,7 @@ module ExceptionHandler(
 );
     // assign exception = opecodeException || ecall || ebreak;
     assign exception = ecall || ebreak;
+    // assign exception = 1'b0; // 目前不处理异常
 
     CSR u_csr(
         .clk(clk),

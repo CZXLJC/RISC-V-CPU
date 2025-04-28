@@ -29,7 +29,8 @@ module Registers(
     input logic [4:0] rd,
     input logic [31:0] writeData,
     output logic [31:0] rdata1,
-    output logic [31:0] rdata2
+    output logic [31:0] rdata2,
+    output logic [31:0] rdata3
     );
     reg [31:0] registers [31:0];
 
@@ -44,4 +45,5 @@ module Registers(
     end
     assign rdata1 = registers[rs1];
     assign rdata2 = registers[rs2];
+    assign rdata3 = registers[8]; // x8寄存器的值
 endmodule

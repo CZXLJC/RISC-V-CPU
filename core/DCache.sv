@@ -34,6 +34,10 @@ logic [3:0]       mem_byte_enable;     // 内存字节使能
 logic             mem_write_enable;    // 内存写使能
 logic             write_pending;       // 写操作未命中标志
 
+// 控制信号定义
+logic set_write_pending;   // 设置write_pending信号
+logic clear_write_pending; // 清除write_pending信号
+
 logic read_mem_cnt;
 logic write_mem_cnt;
 
@@ -88,6 +92,14 @@ always_ff @(posedge clk or negedge rst_n) begin
         write_mem_cnt <= 1; // 暂时默认写内存用1个周期
     end else begin
         state <= next_state;
+
+        // 处理write_pending信号
+        if (set_write_pending) begin
+            write_pending <= 1;
+        end else if (clear_write_pending) begin
+            write_pending <= 0;
+        end
+
         if (state == IDLE && (MemRead || MemWrite)) begin
             req_addr <= addr;
             req_index <= curr_index;
@@ -154,7 +166,9 @@ always_comb begin
     mem_write_enable = 0;
     mem_byte_enable = 4'b0000;
     data_read = 32'b0;
-
+    // 默认控制信号置零
+    set_write_pending = 0;
+    clear_write_pending = 0;
     case (state)
         IDLE: begin
             if (MemRead) begin
@@ -176,7 +190,8 @@ always_comb begin
                     endcase
                 end else begin
                     // 未命中，设置write_pending = 0
-                    write_pending = 0;
+                    // write_pending = 0;
+                    clear_write_pending = 1; // 原write_pending = 0
                     stall_dcache = 1;
                     if (cache[curr_index].valid && cache[curr_index].dirty) begin
                         next_state = WRITE_MEM;
@@ -189,7 +204,8 @@ always_comb begin
                     // 写命中：在时序逻辑中更新缓存
                 end else begin
                     // 未命中，设置write_pending = 1
-                    write_pending = 1;
+                    // write_pending = 1;
+                    set_write_pending = 1; // 原write_pending = 1
                     stall_dcache = 1;
                     if (cache[curr_index].valid && cache[curr_index].dirty) begin
                         next_state = WRITE_MEM;
@@ -233,6 +249,8 @@ always_comb begin
                         end
                         default: data_read = cache[curr_index].data;
                 endcase
+            end else begin
+                clear_write_pending = 1;
             end
             next_state = IDLE;
             stall_dcache = 0;

@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
+// `include "Const.svh"
 module CPU(
     input logic clk,
     input logic rst_n
@@ -37,6 +37,7 @@ module CPU(
     logic Jump;
     logic isJalr;
     logic isAuipc;
+    logic       ecall, ebreak, mret;
     logic [3:0] ALUControl;
     logic [2:0] BLUControl;
     logic [2:0] MEMControl;
@@ -61,6 +62,11 @@ module CPU(
             writeData = (MemtoReg) ? MemReadData : ALUResult;
         end
     end
+
+    logic exception;
+    // logic [`DATA_WID] handler_pc;
+    logic [31:0] handler_pc;
+    logic [31:0] csr_pc;
 
     InstructionMem u_InstructionMem(
         .clka(clk),
@@ -99,6 +105,9 @@ module CPU(
         .Jump(Jump),
         .isJalr(isJalr),
         .isAuipc(isAuipc),
+        .ecall(ecall),
+        .ebreak(ebreak),
+        .mret(mret),
         .ALUControl(ALUControl),
         .BLUControl(BLUControl),
         .MEMControl(MEMControl)
@@ -123,6 +132,19 @@ module CPU(
         .BranchTarget(BranchTarget)
     );
 
+    ExceptionHandler u_ExceptionHandler(
+        .clk(clk),
+        .rst_n(rst_n),
+        .pc(pc),
+        .inst(instruction),
+        // .opecodeException(1'b0), // 这里需要连接到操作码异常信号
+        .ecall(ecall),
+        .ebreak(ebreak),
+        .exception(exception),
+        .handler_pc(handler_pc),
+        .pc_out(csr_pc)
+    );
+
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             old_pc <= 32'b0;
@@ -131,7 +153,13 @@ module CPU(
             flush <= 1'b0;
         end else begin
             program_on <= 1'b1;
-            if (BranchTaken) begin
+            if (mret) begin
+                pc <= csr_pc;
+                flush <= 1'b1;
+            end else if (exception) begin
+                pc <= handler_pc;
+                flush <= 1'b1;
+            end else if (BranchTaken) begin
                 pc <= BranchTarget;
                 flush <= 1'b1;
             end else if (!stall_dcache) begin

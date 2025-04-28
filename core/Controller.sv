@@ -44,12 +44,18 @@
 
 module Controller(
     input logic [6:0] opcode,
+    input logic [11:0] funct12,
     output logic RegWrite, MemWrite, MemRead, MemtoReg, ALUSrc, Branch,
     output logic Jump, isJalr, isAuipc,
-    output logic [1:0] ALUOp
+    output logic [1:0] ALUOp,
+    output logic ecall,
+    output logic ebreak,
+    output logic mret, // mret instruction
+    output logic opecodeException
     );
     // Decode the instruction
-    logic isR, isI, isS, isB, isU, isJ;
+    logic isR, isI, isS, isB, isU, isJ, isE;
+    logic isNOP;
     logic isLoad, isImmediate;
     logic isLui;
     assign isR = (opcode == 7'b0110011);
@@ -63,6 +69,8 @@ module Controller(
     // assign isLui = (opcode == 7'b0110111);
     assign isAuipc = (opcode == 7'b0010111);
     assign isJ = (opcode == 7'b1101111); // i.e. JAL
+    assign isE = (opcode == 7'b1110011); // Enviroment instructions
+    assign isNOP = (opcode == 7'b0000000); // NOP instruction
     // Control signals
     assign RegWrite = isR || isI || isU || isJ;
     assign MemWrite = isS;
@@ -71,11 +79,15 @@ module Controller(
     assign ALUSrc = isI || isS || isU || isJ;
     assign Branch = isB;
     assign ALUOp = 
-        (isLoad || isS) ? 2'b00 : // I-type and S-type, perform add operation
+        (isLoad || isS || isU || isJ) ? 2'b00 : // I-type and S-type, perform add operation
         (isB) ? 2'b01 : // B-type, perform minus operation
         (isR) ? 2'b10 : // R-type
-        // else -> default
-        2'b11;
+        (isImmediate) ? 2'b11 : // I-type immediate
+        2'b00; // default
     assign Jump = isJ || isJalr;
+    assign ecall = isE && (funct12 == 12'b000000000000); // ecall instruction
+    assign ebreak =isE && (funct12 == 12'b000000000001); // ebreak instruction
+    assign mret = isE && (funct12 == 12'b001100000010); // mret instruction
+    assign opecodeException = !(isR || isI || isS || isB || isU || isJ || ecall || ebreak || isNOP); // opcode exception
 endmodule
 

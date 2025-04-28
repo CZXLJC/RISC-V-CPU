@@ -39,6 +39,9 @@ module Decoder(
     output logic Jump,
     output logic isJalr,
     output logic isAuipc,
+    output logic ecall, 
+    output logic ebreak,
+    output logic mret,
     output logic [3:0] ALUControl,
     output logic [2:0] BLUControl,
     output logic [2:0] MEMControl
@@ -47,6 +50,7 @@ module Decoder(
     logic [4:0] rs1, rs2, rd;
     logic funct7;
     logic [2:0] funct3;
+    logic [11:0] funct12;
     logic [1:0] ALUOp;
     assign opcode = instruction[6:0];
     assign rd = instruction[11:7];
@@ -54,6 +58,7 @@ module Decoder(
     assign rs2 = instruction[24:20];
     assign funct7 = instruction[30];
     assign funct3 = instruction[14:12];
+    assign funct12 = instruction[31:20];
 
 
     logic MemWrite_temp;
@@ -77,6 +82,7 @@ module Decoder(
     
     Controller u_Controller (
         .opcode(opcode),
+        .funct12(funct12),
         .RegWrite(RegWrite_temp),
         .MemWrite(MemWrite_temp),
         .MemRead(MemRead_temp),
@@ -86,6 +92,9 @@ module Decoder(
         .isJalr(isJalr_temp),
         .isAuipc(isAuipc_temp),
         .ALUSrc(ALUSrc_temp),
+        .ecall(ecall),
+        .ebreak(ebreak),
+        .mret(mret),
         // .MemWrite(MemWrite),
         // .MemRead(MemRead),
         // .MemtoReg(MemtoReg),

@@ -38,7 +38,7 @@ module ALUController(
                 end
             end
             2'b10: ALUControl = {funct7, funct3};
-            default: ALUControl = 4'b0000; // Default case
+            2'b11: ALUControl = {2'b0, funct3}; 
         endcase
     end
 endmodule

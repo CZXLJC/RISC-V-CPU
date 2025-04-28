@@ -96,14 +96,6 @@ module Decoder(
         .ecall(ecall),
         .ebreak(ebreak),
         .mret(mret),
-        // .MemWrite(MemWrite),
-        // .MemRead(MemRead),
-        // .MemtoReg(MemtoReg),
-        // .Branch(Branch),
-        // .Jump(Jump),
-        // .isJalr(isJalr),
-        // .isAuipc(isAuipc),
-        // .ALUSrc(ALUSrc),
         .ALUOp(ALUOp)
     );
     Registers u_Registers (

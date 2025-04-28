@@ -1,0 +1,4 @@
+instruction_code,asm_data
+01802583,"lw x11, 24(x0)"
+00002583,"lw x11, 0(x0)"
+00102583,"lw x11, 1(x0)"

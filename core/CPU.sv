@@ -20,13 +20,21 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 // `include "Const.svh"
-module CPU(
+module CPU #(
+    parameter int limit = 10000
+)(
     input logic clk,
     input logic rst_n,
-    output logic [7:0] led
+    input logic [7:0] sw,
+    output logic [7:0] led,
+    output logic[7:0] seg,
+    output logic[7:0] seg1,
+    output logic[7:0] an
 );
-
+    logic cpu_clk;
     logic mem_clk;
+    logic clk_ms;
+    logic clk_1s;
     logic program_on; // 这个信号保证了指令与pc的同步
     logic [31:0] instruction;
     logic [31:0] old_pc;
@@ -69,8 +77,29 @@ module CPU(
     logic [31:0] handler_pc;
     logic [31:0] csr_pc;
 
+
+    assign cpu_clk = clk_1s;
+
+
+    divclk u_divclk(
+        .clk(clk),
+        .clk_ms(clk_ms),
+        .clk_1s(clk_1s)
+    );
+
+    showLED u_showLED(
+        .clk(cpu_clk),
+        .clk_ms(clk_ms),
+        .rst_n(rst_n),
+        .inst(instruction),
+        .inst_valid(1'b1),
+        .seg(seg),
+        .seg1(seg1),
+        .an(an)
+    );
+
     InstructionMem u_InstructionMem(
-        .clka(clk),
+        .clka(cpu_clk),
         // 读使能
         .ena(program_on),
         .addra(pc_real>>2),
@@ -78,7 +107,7 @@ module CPU(
     );
 
     DCache u_DCache(
-        .clk(clk),
+        .clk(cpu_clk),
         .rst_n(rst_n),
         .addr(ALUResult>>2),
         .data_write(rdata2),
@@ -90,7 +119,7 @@ module CPU(
     );
 
     Decoder u_Decoder(
-        .clk(clk),
+        .clk(cpu_clk),
         .rst_n(rst_n),
         .stall(1'b0),
         .flush(flush),
@@ -137,7 +166,7 @@ module CPU(
     );
 
     ExceptionHandler u_ExceptionHandler(
-        .clk(clk),
+        .clk(cpu_clk),
         .rst_n(rst_n),
         .pc(pc),
         .inst(instruction),
@@ -149,7 +178,7 @@ module CPU(
         .pc_out(csr_pc)
     );
 
-    always_ff @(posedge clk or negedge rst_n) begin
+    always_ff @(posedge cpu_clk or negedge rst_n) begin
         if (!rst_n) begin
             old_pc <= 32'b0;
             pc <= 32'b0;
@@ -158,7 +187,9 @@ module CPU(
         end else begin
             program_on <= 1'b1;
             if (program_on) begin
-                if (mret) begin
+                if (pc>=limit) begin
+                    pc <= pc;
+                end else if (mret) begin
                     pc <= csr_pc;
                     flush <= 1'b1;
                 end else if (exception) begin

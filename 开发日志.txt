@@ -1,0 +1,1 @@
+4/23: 完成了BRU部分，该模块用于支持B类和jal，jarl的跳转；同时修改了ALUController中的ALUOp=2'b01部分逻辑；跳转pc更新逻辑，使用old_pc作为当前pc值，用于分支跳转位置的计算；增加program_on信号，保证指令与pc更新同步。
